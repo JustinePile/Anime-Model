@@ -1,6 +1,8 @@
-# Required imports for Flask
+# Required imports
 from flask import Flask, request, jsonify
 import pandas as pd 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 # Create the Flask app
 app = Flask(__name__)
@@ -9,15 +11,19 @@ app = Flask(__name__)
 file_path = 'data/MAL-anime.csv'
 df = pd.read_csv(file_path)
 
+# Prepare the data for modeling
+X = df.drop(columns=['Score'])  # Features (all columns except 'Score')
+y = df['Score']  # Target variable
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
 # Define a function to create and train the linear regression model
+
 def train_linear_regression_model(X_train_encoded, y_train):
     model = LinearRegression()
     model.fit(X_train_encoded, y_train)
     return model
-
-# Prepare the data for modeling
-X = df.drop(columns=['Score'])  # Features (all columns except 'Score')
-y = df['Score']  # Target variable
 
 # Combine the training and test sets to get all possible categorical values
 combined_data = pd.concat([X, X_test], axis=0)
